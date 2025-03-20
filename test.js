@@ -6,5 +6,5 @@ function onOpen(e) {
 }
 
 function updatePrices() {
-    logger.log("hello")
+    Logger.log("hello from github")
 }
