@@ -57,8 +57,8 @@ function init() {
     }
   });
 
-  // Add a new trigger that updates prices every 30 minutes
-  Logger.log("Adding new 'updatePrices' trigger (update prices every 30 minutes)");
+  // Add a new trigger that updates prices every hour
+  Logger.log("Adding new 'updatePrices' trigger (update prices every hour)");
   ScriptApp.newTrigger("updatePrices")
     .timeBased()
     .everyHours(1)
