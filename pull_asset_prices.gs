@@ -41,10 +41,10 @@
  * you can donate here: https://your-ko-fi-or-donation-link
  */
 
-VERSION = "1.0.1";
-ASSETS_SHEET_NAME = "Asset Prices";
-UPDATE_RESULTS_RANGE = "update_results";
-LAST_UPDATED_RANGE = "prices_last_updated";
+const VERSION = "1.0.0";
+const ASSETS_SHEET_NAME = "Asset Prices";
+const UPDATE_RESULTS_RANGE = "update_results";
+const LAST_UPDATED_RANGE = "prices_last_updated";
 
 function init() {
   Logger.log("Initializing project...")
@@ -69,19 +69,99 @@ function init() {
   Logger.log("Project initialized!")
 }
 
-function displayVersion() {
-  var html = HtmlService.createHtmlOutput("<p>Hello, world!</p>")
-                        .setWidth(300)
-                        .setHeight(200);
-  SpreadsheetApp.getUi().showModalDialog(html, "Fancy Modal");
-}
 
 function onOpen(e) {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu("Pull Asset Prices")
     .addItem("Pull Prices Now", "updatePrices")
-    .addItem("Check for updates", "displayVersion")
+    .addItem("Price Variable - Usage Example", "displayPriceVariableExampleModal")
+    .addItem("Check For Updates", "displayVersionCheckModal")
     .addToUi();
+}
+
+
+function displayVersionCheckModal() {
+  const localVersion = VERSION;
+  const remoteVersion = getVersionFromGithubScript();
+  
+  if (remoteVersion) {
+    var updateAvailable = false;
+
+    const localVersionParts = localVersion.split(/\./);
+    const remoteVersionParts = remoteVersion.split(/\./);
+    for (var i = 0; i < localVersionParts.length; i++) {
+      if (remoteVersionParts[i] > localVersionParts[i]) {
+        updateAvailable = true;
+      }
+    }
+
+    if (updateAvailable) {
+      var html = `<h4>An update is available! 🤖</h4>
+      <p>Local Version: ` + localVersion + `<br>
+      Remote Version: ` + remoteVersion + `</p>
+      <p>Updates might include bug fixes or new features. If the tool is working well for you, there's no reason you need to update.</p>
+      View the <a href="https://simplesheet.github.io/docs/tools/get-asset-prices/update.html" target="_blank" rel="noopener">Update Instructions</a> if you would like to update.`;
+
+    } else {
+      var html = `<h4>You're all up to date! 🎉</h4>
+      <p>Your Version: ` + localVersion + `</p>`;
+    }
+
+  } else {
+    var html = `<h4>There was a issue checking for updates 🤔</h4>
+    <p>Your Version: ` + localVersion + `</p>
+    Please try again later...`;
+  }
+
+  var htmlObject = HtmlService.createHtmlOutput(html)
+                              .setWidth(500)
+                              .setHeight(210);
+  SpreadsheetApp.getUi().showModalDialog(htmlObject, "Check For Updates");
+}
+
+
+function getVersionFromGithubScript() {
+  const url = 'https://raw.githubusercontent.com/simplesheet/pull-asset-prices/refs/heads/main/pull_asset_prices.gs';
+  const response = UrlFetchApp.fetch(url);
+  const scriptContent = response.getContentText();
+
+  const versionMatch = scriptContent.match(/VERSION\s*=\s*["']([^"']+)["']/);
+  if (versionMatch && versionMatch[1]) {
+    Logger.log('Remote VERSION: ' + versionMatch[1]);
+    return versionMatch[1];
+  } else {
+    Logger.log('VERSION not found.');
+    return null;
+  }
+}
+
+
+function displayPriceVariableExampleModal() {
+  var spreadsheetUrl = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  var html = `<p>Using <strong>BTC</strong> as an example...</p>
+<h4 style="margin-bottom: 2px;">To use the price of BTC on another tab in THIS spreadsheet</h4>
+<table border="1" style="border-collapse: collapse; width: 100%;">
+    <tbody>
+        <tr>
+            <td style="border: 1px solid #aaa; padding: 8px; text-align: left; background-color: #AFDDC0">Enter the
+                following formula into a cell:<br> <strong>=BTC_Price</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<h4 style="margin-bottom: 2px;">To use the price of BTC in a DIFFERENT spreadsheet</h4>
+<table border=" 1" style="border-collapse: collapse; width: 100%;">
+    <tbody>
+        <tr>
+            <td style="border: 1px solid #aaa; padding: 8px; text-align: left; background-color: #AFDDC0">Enter the
+                following formula into a cell: <strong>=IMPORTRANGE("` + spreadsheetUrl + `", "BTC_Price")</strong></td>
+        </tr>
+    </tbody>
+</table>`;
+  var htmlObject = HtmlService.createHtmlOutput(html)
+                              .setWidth(600)
+                              .setHeight(260);
+  SpreadsheetApp.getUi().showModalDialog(htmlObject, "Price Variable Example");
 }
 
 
@@ -90,7 +170,7 @@ function updatePrices() {
   var assetPricesSheet = spreadsheet.getSheetByName(ASSETS_SHEET_NAME);
 
   if (!assetPricesSheet) {
-    buildAssetPriceSheet();
+    init();
     var assetPricesSheet = spreadsheet.getSheetByName(ASSETS_SHEET_NAME);
   }
 
@@ -272,7 +352,7 @@ function addLogEntry(spreadsheet, newLogEntry) {
 // https://finance.yahoo.com/
 // This is an 'unofficial' API so it isn't well documented and could change
 // Limit: 2,000 per hour. 5-10 per second.
-// Each updatePrices() execution uses 1 request for each stock in the list (~180 requests per hour when triggered every 10 minutes)
+// Each updatePrices() execution uses 1 request for each stock in the list
 function getStockPrice(ticker) {
   try {
     var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker;
@@ -369,9 +449,6 @@ function getMetalPrice(metal) {
 
 
 
-
-
-
 ///////////////////////////////
 //  Build Asset Price Sheet  //
 /////////////////////////////// 
@@ -463,7 +540,7 @@ function buildAssetPriceSheet() {
     var donateLinkRange = sheet.getRange(usefulLinksStartColumn + donateLinkRow + ":" + usefulLinksEndColumn + donateLinkRow);
     donateLinkRange.merge()
     const donateRichText = SpreadsheetApp.newRichTextValue()
-      .setText("Want to share your appreciation? Donate")
+      .setText("Want to support development? Donate here.")
       .setLinkUrl("https://ko-fi.com/simplesheet")
       .build();
 
@@ -733,7 +810,7 @@ function buildAssetPriceSheet() {
   var updateResultsEndColumn = 'Q';
   var updateResultsStartRow = 2;
   var updateResultsDescStart = updateResultsStartRow + 1;
-  var updateResultsDescEnd = updateResultsDescStart + 5;
+  var updateResultsDescEnd = updateResultsDescStart + 4;
   var updateResultsLogStart = updateResultsDescEnd + 1;
   var updateResultsLogEnd =  updateResultsLogStart + 124;
 
@@ -751,9 +828,8 @@ function buildAssetPriceSheet() {
   // Update Results Description
   var zeroPriceFontStyle = SpreadsheetApp.newTextStyle().setBold(true).setForegroundColor("red").build();
   var updateResultsRichText = SpreadsheetApp.newRichTextValue()
-    .setText("The results from the last update are logged here.\n\nIf you get a price of $0.00 for one of your listed assets:\n - It means an issue occured.\n - Review the messages below for an explanation.\n - If needed, check the common issues page for more information.")
+    .setText("The results from the last update are logged here.\n\nIf you get a price of $0.00 for one of your listed assets:\n - It means an issue occured.\n - Review the messages below for an explanation.")
     .setTextStyle(72, 78, zeroPriceFontStyle)
-    .setLinkUrl(213, 226, "https://google.com")
     .build();
   var updateResultsDescRange = sheet.getRange(updateResultsStartColumn + updateResultsDescStart + ":" + updateResultsEndColumn + updateResultsDescEnd);
   updateResultsDescRange.merge()
@@ -804,8 +880,5 @@ function setBannerPhoto() {
   image.setWidth(totalWidth);
   image.setHeight(totalWidth * aspectRatio);
 }
-
-
-
 
 
