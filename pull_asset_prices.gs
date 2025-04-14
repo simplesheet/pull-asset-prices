@@ -166,6 +166,7 @@ function displayPriceVariableExampleModal() {
 
 
 function updatePrices() {
+  checkBannerImage();
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var assetPricesSheet = spreadsheet.getSheetByName(ASSETS_SHEET_NAME);
 
@@ -881,4 +882,14 @@ function setBannerPhoto() {
   image.setHeight(totalWidth * aspectRatio);
 }
 
+
+function checkBannerImage() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ASSETS_SHEET_NAME);
+  var images = sheet.getImages();
+
+  if (images.length === 0) {
+    Logger.log("No floating images found.");
+    setBannerPhoto();
+  }
+}
 
