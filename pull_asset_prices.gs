@@ -41,7 +41,7 @@
  * you can donate here: https://your-ko-fi-or-donation-link
  */
 
-const VERSION = "1.0.1";
+const VERSION = "1.0.2";
 const ASSETS_SHEET_NAME = "Asset Prices";
 const UPDATE_RESULTS_RANGE = "update_results";
 const LAST_UPDATED_RANGE = "prices_last_updated";
