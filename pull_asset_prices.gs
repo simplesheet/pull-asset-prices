@@ -166,7 +166,6 @@ function displayPriceVariableExampleModal() {
 
 
 function updatePrices() {
-  checkBannerImage();
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var assetPricesSheet = spreadsheet.getSheetByName(ASSETS_SHEET_NAME);
 
@@ -174,6 +173,8 @@ function updatePrices() {
     init();
     var assetPricesSheet = spreadsheet.getSheetByName(ASSETS_SHEET_NAME);
   }
+
+  checkBannerImage();
 
   // Reset Update Results (logging) output
   spreadsheet.getRange(UPDATE_RESULTS_RANGE).setValue("");
@@ -904,4 +905,3 @@ function checkBannerImage() {
     setBannerPhoto();
   }
 }
-
