@@ -100,7 +100,7 @@ function displayVersionCheckModal() {
       <p>Local Version: ` + localVersion + `<br>
       Remote Version: ` + remoteVersion + `</p>
       <p>Updates might include bug fixes or new features. If the tool is working well for you, there's no reason you need to update.</p>
-      View the <a href="https://simplesheet.github.io/docs/tools/get-asset-prices/update.html" target="_blank" rel="noopener">Update Instructions</a> if you would like to update.`;
+      View the <a href="https://simplesheet.github.io/docs/tools/pull-asset-prices/update.html" target="_blank" rel="noopener">Update Instructions</a> if you would like to update.`;
 
     } else {
       var html = `<h4>You're all up to date! 🎉</h4>
@@ -514,7 +514,7 @@ function buildAssetPriceSheet() {
     instructionsLinkRange.merge()
     const instructionsRichText = SpreadsheetApp.newRichTextValue()
       .setText("Full Instructions")
-      .setLinkUrl("https://simplesheet.github.io/docs/tools/get-asset-prices/instructions.html")
+      .setLinkUrl("https://simplesheet.github.io/docs/tools/pull-asset-prices/instructions.html")
       .build();
 
     instructionsLinkRange.setRichTextValue(instructionsRichText)
