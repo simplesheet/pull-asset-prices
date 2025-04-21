@@ -264,9 +264,21 @@ function updatePrices() {
             addLogEntry(spreadsheet, error);
           }
 
-          // Set price Value
-          currentPriceCell.setValue(price);
-          addLogEntry(spreadsheet, currentTickerValue + " price updated to $" + price);
+          // Convert the price to a number format if needed
+          // This is important for Localization formatting
+          if (typeof price === 'string') {
+            price = Number(price);
+          }
+
+          // Make sure the number conversion worked before setting the value
+          if (typeof price === 'number' && !isNaN(price)) {
+            // Set price Value
+            currentPriceCell.setValue(price);
+            addLogEntry(spreadsheet, currentTickerValue + " price updated to $" + price);
+          } else {
+            addLogEntry(spreadsheet, currentTickerValue + " Invalid price format: '" + typeof price + "'. Failed to convert to number-type.");
+            price = 0;
+          }
 
           if (price != 0) {
             // Build Named Range 'Name'
