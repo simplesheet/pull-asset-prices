@@ -41,7 +41,7 @@
  * you can donate here: https://your-ko-fi-or-donation-link
  */
 
-const VERSION = "1.0.2";
+const VERSION = "1.0.3";
 const ASSETS_SHEET_NAME = "Asset Prices";
 const UPDATE_RESULTS_RANGE = "update_results";
 const LAST_UPDATED_RANGE = "prices_last_updated";
@@ -368,6 +368,13 @@ function addLogEntry(spreadsheet, newLogEntry) {
 // Limit: 2,000 per hour. 5-10 per second.
 // Each updatePrices() execution uses 1 request for each stock in the list
 function getStockPrice(ticker) {
+
+  // Format tickers if needed (these are upon request of users)
+  // E.g. for MVI: https://finance.yahoo.com/quote/MVI-USD
+  if (ticker === "MVI" || ticker === "DPI") {
+    ticker = ticker + "-USD";
+  }
+
   try {
     var url = "https://query1.finance.yahoo.com/v8/finance/chart/" + ticker;
     var response = UrlFetchApp.fetch(url);
